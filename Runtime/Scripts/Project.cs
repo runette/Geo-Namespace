@@ -199,7 +199,8 @@ namespace Project
         Line,
         Polygon,
         DEM,
-        Graph
+        Graph,
+        XSect
     }
 
 
