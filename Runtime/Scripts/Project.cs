@@ -9,10 +9,21 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 using System.ComponentModel;
 
+
+
 namespace Project
 {
     public class GisProject : TestableObject
     {
+
+        private const string TYPE = "geo";
+        private const string VERSION = "1.0.2";
+
+        public static string GetVersion()
+        {
+            return $"{TYPE}:{VERSION}";
+        }
+
         [JsonProperty(PropertyName = "version", Required = Required.Always)]
         public string ProjectVersion;
 
@@ -50,7 +61,7 @@ namespace Project
         [JsonConverter(typeof(StringEnumConverter))]
         public RecordSetDataType DataType;
         [JsonProperty(PropertyName = "source")]
-        public string Source;  
+        public string Source;
         [JsonProperty(PropertyName = "position")]
         public Point Position;
         [JsonProperty(PropertyName = "transform")]
@@ -77,7 +88,7 @@ namespace Project
         public SerializableVector3 Scale;
     }
 
-    public class VectorConverter<T>  : JsonConverter where T: Serializable, new()
+    public class VectorConverter<T> : JsonConverter where T : Serializable, new()
     {
         public VectorConverter()
         {
@@ -182,8 +193,85 @@ namespace Project
         [JsonProperty(PropertyName = "imagery_source_type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [DefaultValue("MapboxOutdoors")]
         public string imagerySourceType;
+        [JsonProperty(PropertyName = "image_folder")]
+        public string imageSource;
+        [JsonProperty(PropertyName = "bh-data")]
+        public BoreHoleData bhdata;
     }
 
+
+    public struct BoreHoleData
+    {
+        [JsonProperty(PropertyName = "x-field")]
+        public string xField;
+        [JsonProperty(PropertyName = "y-field")]
+        public string yField;
+        [JsonProperty(PropertyName = "z-field")]
+        public string zField;
+        [JsonProperty(PropertyName = "id-field")]
+        public string idField;
+        [JsonProperty(PropertyName = "inc-field")]
+        public string incField;
+        [JsonProperty(PropertyName = "azi-field")]
+        public string aziField;
+        [JsonProperty(PropertyName = "from-field")]
+        public string fromField;
+        [JsonProperty(PropertyName = "to-field")]
+        public string toField;
+        [JsonProperty(PropertyName = "data-field")]
+        public string dataField;
+        [JsonProperty(PropertyName = "data-source")]
+        public string dataSource;
+        [JsonProperty(PropertyName = "log-id-field")]
+        public string logIdField;
+        [JsonProperty(PropertyName = "Legend")]
+        [JsonConverter(typeof(LegendConverter))]
+        public Dictionary<string, SerializableColor> legend;
+        [JsonProperty(PropertyName = "eoh-field")]
+        public string lengthField;
+    }
+
+
+    public class LegendConverter : JsonConverter
+    {
+        public LegendConverter()
+        {
+            // do nothing
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return typeof(Dictionary<string,SerializableColor>).IsAssignableFrom(objectType);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.Null:
+                    return null;
+                case JsonToken.StartObject:
+                    JObject jobject = JObject.Load(reader);
+                    Dictionary<string, SerializableColor> result = new Dictionary<string, SerializableColor>();
+                    foreach (var x in jobject)
+                    {
+                        string key = x.Key;
+                        SerializableColor value = JsonConvert.DeserializeObject<SerializableColor>(x.Value.ToString(), new VectorConverter<SerializableColor>());
+                        result.Add(key, value);
+                    }
+
+                    return result;
+            }
+
+            throw new JsonReaderException("expected null, object or array token but received " + reader.TokenType);
+        }
+
+
+        public override void WriteJson(JsonWriter writer, object vector, JsonSerializer serializer)
+        {
+            serializer.Serialize(writer, vector);
+        }
+    }
 
     /// <summary>
     /// Acceptable values for Recordset Type
@@ -200,7 +288,8 @@ namespace Project
         Polygon,
         DEM,
         Graph,
-        XSect
+        XSect,
+        BoreHole
     }
 
 
