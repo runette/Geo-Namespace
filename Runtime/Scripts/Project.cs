@@ -267,9 +267,15 @@ namespace Project
         }
 
 
-        public override void WriteJson(JsonWriter writer, object vector, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object legend, JsonSerializer serializer)
         {
-            serializer.Serialize(writer, vector);
+            Dictionary<string, object> temp = new Dictionary<string, object>();
+            Dictionary<string, SerializableColor> newlegend = (legend as Dictionary<string, SerializableColor>);
+            foreach (KeyValuePair<string, SerializableColor> kv in newlegend)
+            {
+                temp.Add(kv.Key, kv.Value.ToArray());
+            }
+            serializer.Serialize(writer, temp);
         }
     }
 
