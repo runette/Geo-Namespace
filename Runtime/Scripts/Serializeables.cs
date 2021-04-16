@@ -46,6 +46,10 @@ namespace Project
 
         public SerializableVector3() { }
 
+        /// <summary>
+        /// Build from Json and swap the Y and Z axes
+        /// </summary>
+        /// <param name="r">IList<float> world coordinates  z up</param>
         public override void Update(IList<float> r)
         {
             x = r[0];
@@ -137,6 +141,10 @@ namespace Project
 
         public SerializableQuaternion() { }
 
+        /// <summary>
+        /// Build from Json and swap the Y and Z axes
+        /// </summary>
+        /// <param name="r">IList<float> world coordinates  z up</param>
         public override void Update(IList<float> r)
         {
             x = r[0];
