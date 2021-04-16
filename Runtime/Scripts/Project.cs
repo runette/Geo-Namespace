@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 using System.ComponentModel;
+using UnityEngine;
 
 
 
@@ -33,9 +34,8 @@ namespace Project
         [JsonProperty(PropertyName = "origin", Required = Required.Always)]
         public Point Origin;
 
-        [JsonProperty(PropertyName = "scale", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        [DefaultValue(1f)]
-        public float Scale;
+        [JsonProperty(PropertyName = "scales")]
+        public List<float> Scale;
 
         [JsonProperty(PropertyName = "default_proj")]
         public string projectCrs;
@@ -86,6 +86,11 @@ namespace Project
         [JsonProperty(PropertyName = "scale", Required = Required.Always)]
         [JsonConverter(typeof(VectorConverter<SerializableVector3>))]
         public SerializableVector3 Scale;
+
+        public static JsonTransform zero()
+        {
+            return new JsonTransform() { Position = Vector3.zero, Rotate = Quaternion.identity, Scale = Vector3.zero };
+        }
     }
 
     public class VectorConverter<T> : JsonConverter where T : Serializable, new()
@@ -163,38 +168,96 @@ namespace Project
         }
     }
 
+    /// <summary>
+    /// Object that holds the layer properties
+    /// </summary>
     public struct GeogData {
+        /// <summary>
+        /// list of symbology units for this layer
+        /// </summary>
         [JsonProperty(PropertyName = "units")]
         public Dictionary<string, Unit> Units;
+        /// <summary>
+        /// DEM or DTM to map these values onto
+        /// </summary>
         [JsonProperty(PropertyName = "dem")]
         public string Dem;
+        /// <summary>
+        /// Header string to be used when converting raster bands to point cloud data for vizualisation
+        /// identifies the properties names that the raster bands are mapped to in order
+        /// </summary>
+        [JsonProperty(PropertyName = "header-string")]
+        public string headerString;
+        /// <summary>
+        /// Color mode to be used for raster layers
+        /// </summary>
+        [JsonProperty(PropertyName = "color-mode", DefaultValueHandling = DefaultValueHandling.Populate)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        [DefaultValue("SinglebandGrey")]
+        public ColorMode ColorMode;
+        /// <summary>
+        /// PDAL Colorinterp strnig
+        /// </summary>
         [JsonProperty(PropertyName = "colorinterp")]
         public Dictionary<string, object> ColorInterp;
+        /// <summary>
+        /// PDAL Filter String
+        /// </summary>
         [JsonProperty(PropertyName = "filter")]
         public List<Dictionary<string, object>> Filter;
+        /// <summary>
+        /// Bounding Box
+        /// </summary>
         [JsonProperty(PropertyName = "bbox")]
         public List<double> BBox;
+        /// <summary>
+        /// GDAL Source Type
+        /// </summary>
         [JsonProperty(PropertyName = "source-type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [DefaultValue(SourceType.File)]
         public SourceType SourceType;
+        /// <summary>
+        /// Open Read only ?
+        /// </summary>
         [JsonProperty(PropertyName = "read-only", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [DefaultValue(false)]
         public bool ReadOnly;
+        /// <summary>
+        /// MapBox Map Scale Factor
+        /// </summary>
         [JsonProperty(PropertyName = "mapscale")]
         public Int32 MapScale;
+        /// <summary>
+        /// MapBox Map Size FGactor
+        /// </summary>
         [JsonProperty(PropertyName = "map_size")]
         public int MapSize;
+        /// <summary>
+        /// Mapbox Elevation Source Type
+        /// </summary>
         [JsonProperty(PropertyName = "elevation_source_type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [DefaultValue("MapboxTerrain")]
         public string elevationSourceType;
+        /// <summary>
+        /// MapBox Elevation Layer4 Type 
+        /// </summary>
         [JsonProperty(PropertyName = "elevation_layer_type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [DefaultValue("FlatTerrain")]
         public string elevationLayerType;
+        /// <summary>
+        /// MapBox Imagery Source Type
+        /// </summary>
         [JsonProperty(PropertyName = "imagery_source_type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
         [DefaultValue("MapboxOutdoors")]
         public string imagerySourceType;
+        /// <summary>
+        /// Folder to use to fins XSecvt images
+        /// </summary>
         [JsonProperty(PropertyName = "image_folder")]
         public string imageSource;
+        /// <summary>
+        /// Borehole Data Object
+        /// </summary>
         [JsonProperty(PropertyName = "bh-data")]
         public BoreHoleData bhdata;
     }
@@ -317,7 +380,6 @@ namespace Project
         TCP,
     }
 
-
     public class Unit : TestableObject
     {
         /// <summary>
@@ -356,6 +418,16 @@ namespace Project
         Spheroid,
         Cuboid,
         Cylinder
+    }
+
+    /// <summary>
+    /// Acceptable values for color-mode
+    /// </summary>
+    public enum ColorMode
+    {
+        MultibandColor,
+        SinglebandColor,
+        SinglebandGrey
     }
 
     /// <summary>
