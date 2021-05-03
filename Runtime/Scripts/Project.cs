@@ -214,6 +214,7 @@ namespace Project
         /// GDAL Source Type
         /// </summary>
         [JsonProperty(PropertyName = "source-type", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+        [JsonConverter(typeof(StringEnumConverter))]
         [DefaultValue(SourceType.File)]
         public SourceType SourceType;
         /// <summary>
@@ -371,7 +372,7 @@ namespace Project
         OAPIF,
         WMS,
         WCS,
-        DB,
+        PG,
         AWS,
         GCS,
         Azure,
