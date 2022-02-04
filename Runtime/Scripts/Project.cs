@@ -359,7 +359,8 @@ namespace Project
         DEM,
         Graph,
         XSect,
-        BoreHole
+        BoreHole,
+        Voxel
     }
 
 
