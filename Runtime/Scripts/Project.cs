@@ -18,7 +18,7 @@ namespace Project
     {
 
         private const string TYPE = "geo";
-        private const string VERSION = "1.0.4";
+        private const string VERSION = "1.0.5";
 
         public static string GetVersion()
         {
