@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System;
 using GeoJSON.Net.Geometry;
 using Newtonsoft.Json;
@@ -11,7 +12,6 @@ using System.ComponentModel;
 using UnityEngine;
 
 
-
 namespace Project
 {
     public class GisProject : TestableObject
@@ -19,6 +19,14 @@ namespace Project
 
         private const string TYPE = "geo";
         private const string VERSION = "1.0.5";
+
+        public string path { set
+            {
+                foreach (RecordSet set in RecordSets)
+                {
+                    set.path = value;
+                }
+            } }
 
         public static string GetVersion()
         {
@@ -53,6 +61,14 @@ namespace Project
 
     public class RecordSet : TestableObject
     {
+        private string m_Path;
+
+        public string path { get { return m_Path; } set
+            {
+                m_Path= value;
+                Properties.path = value;
+            } }
+
         [JsonProperty(PropertyName = "id", Required = Required.Always)]
         public string Id;
         [JsonProperty(PropertyName = "display-name")]
@@ -61,7 +77,9 @@ namespace Project
         [JsonConverter(typeof(StringEnumConverter))]
         public RecordSetDataType DataType;
         [JsonProperty(PropertyName = "source")]
-        public string Source;
+        private string m_source;
+        public string Source { get { return Path.GetFullPath(Path.Combine( path, m_source)); }
+            set { m_source = value; } }
         [JsonProperty(PropertyName = "position")]
         public Point Position;
         [JsonProperty(PropertyName = "transform")]
@@ -172,6 +190,16 @@ namespace Project
     /// Object that holds the layer properties
     /// </summary>
     public struct GeogData {
+
+        private string m_Path;
+
+        public string path { 
+            get { return m_Path; }
+            set { 
+                m_Path = value;
+                bhdata.path = value;
+            }
+        }
         /// <summary>
         /// list of symbology units for this layer
         /// </summary>
@@ -181,7 +209,11 @@ namespace Project
         /// DEM or DTM to map these values onto
         /// </summary>
         [JsonProperty(PropertyName = "dem")]
-        public string Dem;
+        private string m_Dem;
+
+        public string Dem { 
+            get { return Path.GetFullPath(Path.Combine(path, m_Dem)); } 
+        }
         /// <summary>
         /// Header string to be used when converting raster bands to point cloud data for vizualisation
         /// identifies the properties names that the raster bands are mapped to in order
@@ -255,7 +287,11 @@ namespace Project
         /// Folder to use to fins XSecvt images
         /// </summary>
         [JsonProperty(PropertyName = "image_folder")]
-        public string imageSource;
+        private string m_ImageSource;
+
+        public string imageSource { 
+            get { return Path.GetFullPath(Path.Combine(path, m_ImageSource)); } 
+        }
         /// <summary>
         /// Borehole Data Object
         /// </summary>
@@ -266,6 +302,8 @@ namespace Project
 
     public struct BoreHoleData
     {
+        public string path;
+        
         [JsonProperty(PropertyName = "x-field")]
         public string xField;
         [JsonProperty(PropertyName = "y-field")]
@@ -285,7 +323,9 @@ namespace Project
         [JsonProperty(PropertyName = "data-field")]
         public string dataField;
         [JsonProperty(PropertyName = "data-source")]
-        public string dataSource;
+        private string m_DataSource;
+
+        public string dataSource { get { return Path.GetFullPath(Path.Combine(path, m_DataSource)); } }
         [JsonProperty(PropertyName = "log-id-field")]
         public string logIdField;
         [JsonProperty(PropertyName = "Legend")]
