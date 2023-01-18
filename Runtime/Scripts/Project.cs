@@ -198,6 +198,10 @@ namespace Project
             set { 
                 m_Path = value;
                 bhdata.path = value;
+                foreach(Unit unit in Units.Values)
+                {
+                    unit.path = value;
+                }
             }
         }
         /// <summary>
@@ -289,8 +293,18 @@ namespace Project
         [JsonProperty(PropertyName = "image_folder")]
         private string m_ImageSource;
 
-        public string imageSource { 
-            get { return Path.GetFullPath(Path.Combine(path, m_ImageSource)); } 
+        public string imageSource {
+            get
+            {
+                if (m_ImageSource is not null)
+                {
+                    return Path.GetFullPath(Path.Combine(path, m_ImageSource));
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
         /// <summary>
         /// Borehole Data Object
@@ -424,6 +438,7 @@ namespace Project
 
     public class Unit : TestableObject
     {
+        public string path;
         /// <summary>
         /// Color used for the unit of symbology.
         /// 
@@ -450,6 +465,21 @@ namespace Project
         /// </summary>
         [JsonProperty(PropertyName = "label")]
         public string Label;
+
+        [JsonProperty(PropertyName = "texture-image")]
+        private string m_TextureImage;
+
+        public string TextureImage
+        {
+            get { if (m_TextureImage is not null && m_TextureImage != "")
+                {
+                    return Path.GetFullPath(Path.Combine(path, m_TextureImage));
+                }
+                else {
+                    return null;
+                }
+            }
+        }
     }
 
     /// <summary>
