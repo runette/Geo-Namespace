@@ -20,6 +20,7 @@ namespace Project
         private const string TYPE = "geo";
         private const string VERSION = "1.0.5";
 
+        [JsonIgnore]
         public string path { set
             {
                 foreach (RecordSet set in RecordSets)
@@ -61,8 +62,10 @@ namespace Project
 
     public class RecordSet : TestableObject
     {
+        [JsonIgnore]
         private string m_Path;
 
+        [JsonIgnore]
         public string path { get { return m_Path; } set
             {
                 m_Path= value;
@@ -77,7 +80,9 @@ namespace Project
         [JsonConverter(typeof(StringEnumConverter))]
         public RecordSetDataType DataType;
         [JsonProperty(PropertyName = "source")]
-        private string m_source;
+        public string m_source;
+
+        [JsonIgnore]
         public string Source { get { return Path.GetFullPath(Path.Combine( path, m_source)); }
             set { m_source = value; } }
         [JsonProperty(PropertyName = "position")]
@@ -191,8 +196,10 @@ namespace Project
     /// </summary>
     public struct GeogData {
 
+        [JsonIgnore]
         private string m_Path;
 
+        [JsonIgnore]
         public string path { 
             get { return m_Path; }
             set { 
@@ -213,8 +220,9 @@ namespace Project
         /// DEM or DTM to map these values onto
         /// </summary>
         [JsonProperty(PropertyName = "dem")]
-        private string m_Dem;
+        public string m_Dem;
 
+        [JsonIgnore]
         public string Dem { 
             get { return Path.GetFullPath(Path.Combine(path, m_Dem)); } 
         }
@@ -291,8 +299,9 @@ namespace Project
         /// Folder to use to fins XSecvt images
         /// </summary>
         [JsonProperty(PropertyName = "image_folder")]
-        private string m_ImageSource;
+        public string m_ImageSource;
 
+        [JsonIgnore]
         public string imageSource {
             get
             {
@@ -316,6 +325,7 @@ namespace Project
 
     public struct BoreHoleData
     {
+        [JsonIgnore]
         public string path;
         
         [JsonProperty(PropertyName = "x-field")]
@@ -337,8 +347,9 @@ namespace Project
         [JsonProperty(PropertyName = "data-field")]
         public string dataField;
         [JsonProperty(PropertyName = "data-source")]
-        private string m_DataSource;
+        public string m_DataSource;
 
+        [JsonIgnore]
         public string dataSource { get { return Path.GetFullPath(Path.Combine(path, m_DataSource)); } }
         [JsonProperty(PropertyName = "log-id-field")]
         public string logIdField;
@@ -438,6 +449,7 @@ namespace Project
 
     public class Unit : TestableObject
     {
+        [JsonIgnore]
         public string path;
         /// <summary>
         /// Color used for the unit of symbology.
@@ -467,8 +479,9 @@ namespace Project
         public string Label;
 
         [JsonProperty(PropertyName = "texture-image")]
-        private string m_TextureImage;
+        public string m_TextureImage;
 
+        [JsonIgnore]
         public string TextureImage
         {
             get { if (m_TextureImage is not null && m_TextureImage != "")
