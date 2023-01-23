@@ -224,7 +224,11 @@ namespace Project
 
         [JsonIgnore]
         public string Dem { 
-            get { return Path.GetFullPath(Path.Combine(path, m_Dem)); } 
+            get {  
+                if (
+                    m_Dem == null) return null;
+                    return Path.GetFullPath(Path.Combine(path, m_Dem));
+            } 
         }
         /// <summary>
         /// Header string to be used when converting raster bands to point cloud data for vizualisation
@@ -353,7 +357,7 @@ namespace Project
         public string dataSource { get { return Path.GetFullPath(Path.Combine(path, m_DataSource)); } }
         [JsonProperty(PropertyName = "log-id-field")]
         public string logIdField;
-        [JsonProperty(PropertyName = "Legend")]
+        [JsonProperty(PropertyName = "legend")]
         [JsonConverter(typeof(LegendConverter))]
         public Dictionary<string, SerializableColor> legend;
         [JsonProperty(PropertyName = "eoh-field")]
