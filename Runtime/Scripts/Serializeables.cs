@@ -234,7 +234,7 @@ namespace Project
         //makes this class usable as Color, Color normalColor = mySerializableColor;
         public static implicit operator Color(SerializableColor r)
         {
-            return new Color(r.r, r.g, r.b, r.a); ;
+            return new Color(r.r, r.g, r.b, r.a);
         }
 
         //makes this class assignable by Color, SerializableColor myColor = Color.white;

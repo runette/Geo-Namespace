@@ -324,6 +324,9 @@ namespace Project
         /// </summary>
         [JsonProperty(PropertyName = "bh-data")]
         public BoreHoleData bhdata;
+
+        [JsonProperty(PropertyName = "hide-sublayers")]
+        public List<string> hideSublayers;
     }
 
 
