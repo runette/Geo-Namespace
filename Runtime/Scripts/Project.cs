@@ -62,7 +62,6 @@ namespace Project
         public string Crs;
     }
 
-
     public class RecordsetConverter : JsonConverter
     {
         public RecordsetConverter()
@@ -366,6 +365,24 @@ namespace Project
     }
 
     /// <summary>
+    /// Acceptable value for the Shape field in Symbology
+    /// </summary>
+    public enum Shapes
+    {
+        Spheroid,
+        Cuboid,
+        Cylinder
+    }
+
+    /// <summary>
+    /// Acceptable values for color-mode
+    /// </summary>
+    public enum ColorMode
+    {
+        MultibandColor,
+        SinglebandColor,
+        SinglebandGrey
+    }
 
     public class Unit : UnitPrototype
     {
