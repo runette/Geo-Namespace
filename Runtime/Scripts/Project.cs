@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿// copyright Runette Software Ltd, 2020-23. All rights reserved
+using System.Collections.Generic;
 using System.IO;
 using System;
 using Newtonsoft.Json;
@@ -146,18 +147,6 @@ namespace Project
         /// </summary>
         [JsonProperty(PropertyName = "header-string")]
         public string headerString;
-        /// <summary>
-        /// Color mode to be used for raster layers
-        /// </summary>
-        [JsonProperty(PropertyName = "color-mode", DefaultValueHandling = DefaultValueHandling.Populate)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        [DefaultValue("SinglebandGrey")]
-        public ColorMode ColorMode;
-        /// <summary>
-        /// PDAL Colorinterp strnig
-        /// </summary>
-        [JsonProperty(PropertyName = "colorinterp")]
-        public Dictionary<string, object> ColorInterp;
         /// <summary>
         /// PDAL Filter String
         /// </summary>
@@ -417,6 +406,31 @@ namespace Project
                     return null;
                 }
             }
+        }
+        /// <summary>
+        /// Color mode to be used for raster layers
+        /// </summary>
+        [JsonProperty(PropertyName = "color-mode", DefaultValueHandling = DefaultValueHandling.Populate)]
+        [JsonConverter(typeof(StringEnumConverter))]
+        [DefaultValue("SinglebandGrey")]
+        public ColorMode ColorMode;
+        /// <summary>
+        /// PDAL Colorinterp string
+        /// </summary>
+        [JsonProperty(PropertyName = "colorinterp")]
+        public Dictionary<string, object> ColorInterp;
+
+        public Dictionary<string, object> GetCI ()
+        {
+            if (ColorMode == ColorMode.SinglebandColor && ColorInterp != null)
+            {
+                Dictionary<string, object> ci = new(ColorInterp);
+                ci["type"] = "filters.colorinterp";
+                ci["dimension"] = ColorInterp.TryGetValue("dimension", out object t) ?
+                    t : "Z";
+                return ci;
+            }
+            return default;
         }
     }
 }
