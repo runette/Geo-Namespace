@@ -420,17 +420,18 @@ namespace Project
         [JsonProperty(PropertyName = "colorinterp")]
         public Dictionary<string, object> ColorInterp;
 
-        public Dictionary<string, object> GetCI ()
+        public bool GetCI ( out Dictionary<string, object> ci)
         {
             if (ColorMode == ColorMode.SinglebandColor && ColorInterp != null)
             {
-                Dictionary<string, object> ci = new(ColorInterp);
+                ci = new(ColorInterp);
                 ci["type"] = "filters.colorinterp";
                 ci["dimension"] = ColorInterp.TryGetValue("dimension", out object t) ?
                     t : "Z";
-                return ci;
+                return true;
             }
-            return default;
+            ci = null;
+            return false;
         }
     }
 }
