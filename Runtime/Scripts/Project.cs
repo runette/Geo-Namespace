@@ -24,17 +24,12 @@ namespace Project
                 }
             }
         }
-        private const string TYPE = "geo";
-        private const string VERSION = "1.1.0";
-
-        public static string GetVersion()
-        {
-            return $"{TYPE}:{VERSION}";
-        }
+        protected override string TYPE  { get => "Runette";}
+        protected override string VERSION { get => "2.0.0";}
 
         [JsonProperty(PropertyName = "recordsets", Required = Required.Always)]
         [JsonConverter(typeof(RecordsetConverter))]
-        public List<RecordSet> RecordSets;
+        public new List<RecordSet> RecordSets;
     }
 
     public class RecordSet : RecordSetPrototype
@@ -47,6 +42,10 @@ namespace Project
             {
                 m_Path= value;
                 Properties.path = value;
+                if ( Units != null ) foreach(Unit unit in Units.Values)
+                {
+                    unit.path = value;
+                }
             } }
 
         [JsonProperty(PropertyName = "datatype", Required = Required.Always)]
@@ -61,6 +60,18 @@ namespace Project
         public GeogData Properties;
         [JsonProperty(PropertyName = "proj4")]
         public string Crs;
+
+        /// <summary>
+        /// Dictionary of symbology units for this layer
+        /// </summary>
+        [JsonProperty(PropertyName = "units", NullValueHandling = NullValueHandling.Ignore)]
+        public new Dictionary<string, Unit> Units = new();
+
+        /// <summary>
+        /// List of Data Units for this layer
+        /// </summary>
+        [JsonProperty(PropertyName = "data_units")]
+        public new List<DataUnit> DataUnits;
     }
 
     public class RecordsetConverter : JsonConverter
@@ -116,17 +127,9 @@ namespace Project
             set { 
                 m_Path = value;
                 bhdata.path = value;
-                foreach(Unit unit in Units.Values)
-                {
-                    unit.path = value;
-                }
             }
         }
-        /// <summary>
-        /// list of symbology units for this layer
-        /// </summary>
-        [JsonProperty(PropertyName = "units")]
-        public Dictionary<string, Unit> Units;
+
         /// <summary>
         /// DEM or DTM to map these values onto
         /// </summary>
@@ -331,7 +334,8 @@ namespace Project
         Graph,
         XSect,
         BoreHole,
-        Voxel
+        Voxel,
+        Data
     }
 
 
@@ -353,38 +357,13 @@ namespace Project
         TCP,
     }
 
-    /// <summary>
-    /// Acceptable value for the Shape field in Symbology
-    /// </summary>
-    public enum Shapes
-    {
-        Spheroid,
-        Cuboid,
-        Cylinder
-    }
 
-    /// <summary>
-    /// Acceptable values for color-mode
-    /// </summary>
-    public enum ColorMode
-    {
-        MultibandColor,
-        SinglebandColor,
-        SinglebandGrey
-    }
 
     public class Unit : UnitPrototype
     {
         [JsonIgnore]
         public string path;
-        /// <summary>
-        /// The shape to be used by the unit of symbology.
-        /// 
-        /// Must contain an instance of Shapes
-        /// </summary>
-        [JsonProperty(PropertyName = "shape", Required = Required.Always)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public Shapes Shape;
+
         /// <summary>
         /// The transfor to be applied to the unit of symnbology
         /// </summary>
@@ -407,31 +386,14 @@ namespace Project
                 }
             }
         }
-        /// <summary>
-        /// Color mode to be used for raster layers
-        /// </summary>
-        [JsonProperty(PropertyName = "color-mode", DefaultValueHandling = DefaultValueHandling.Populate)]
-        [JsonConverter(typeof(StringEnumConverter))]
-        [DefaultValue("SinglebandGrey")]
-        public ColorMode ColorMode;
-        /// <summary>
-        /// PDAL Colorinterp string
-        /// </summary>
-        [JsonProperty(PropertyName = "colorinterp")]
-        public Dictionary<string, object> ColorInterp;
 
-        public bool GetCI ( out Dictionary<string, object> ci)
-        {
-            if (ColorMode == ColorMode.SinglebandColor && ColorInterp != null)
-            {
-                ci = new(ColorInterp);
-                ci["type"] = "filters.colorinterp";
-                ci["dimension"] = ColorInterp.TryGetValue("dimension", out object t) ?
-                    t : "Z";
-                return true;
-            }
-            ci = null;
-            return false;
-        }
+    }
+
+    public class DataUnit: DataUnitPrototype {
+        /// <summary>
+        /// Dictionary of symbology units for this data unit
+        /// </summary>
+        [JsonProperty(PropertyName = "units")]
+        public new Dictionary<string, Unit> Units;
     }
 }
